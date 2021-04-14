@@ -4,21 +4,21 @@
 #include "mgos_time.h"
 #include "mgos_sys_config.h"
 
-void timer_cb(void *arg) 
+void timer_cb(void *arg)
 {
     int hour;
     char buf[10];
-    int brightness =  mgos_sys_config_get_nixie_brightness();
     time_t now;
     time(&now);
     now += mgos_sys_config_get_nixie_utcoffset()*60*60;
-    
+
     mgos_strftime(buf, sizeof(buf), "%H", now);
     hour = (buf[0]-'0')*10 + (buf[1]-'0');
-    //LOG(LL_INFO, ("hour: %i", hour));
-    
-    if ((hour > 22) || (hour < 6))  brightness /= 4;
-    
+
+    // Reduce brightness when it's (probably) dark outside
+    int brightness =  mgos_sys_config_get_nixie_brightness();
+    if ((hour >= 20) || (hour <= 7))  brightness /= 4;
+
     if (mgos_sys_config_get_nixie_militarytime())
     {
       mgos_strftime(buf, sizeof(buf), "%H%M", now);
@@ -28,6 +28,7 @@ void timer_cb(void *arg)
       mgos_strftime(buf, sizeof(buf), "%I%M", now);
     }
 
+    // Set RGB LED backlights
     int r = ((mgos_sys_config_get_nixie_backlight()>>16)&0xFF)*brightness/127;
     int g = ((mgos_sys_config_get_nixie_backlight()>>8)&0xFF)*brightness/127;
     int b = ((mgos_sys_config_get_nixie_backlight()>>0)&0xFF)*brightness/127;
@@ -36,28 +37,23 @@ void timer_cb(void *arg)
     set_led(3, r, g, b);
     set_led(4, r, g, b);
 
-    if (buf[0] == '0') 
+    if (buf[0] == '0')
     {
+      // Turn nixie tube off, rather than show a 'zero'
       nixie_clear(1);
     }
-    else 
+    else
     {
-      set_led(1, r, g, b);  
+      set_led(1, r, g, b);
       show_digit(1, (unsigned char)(buf[0]-'0'), brightness, 0);
     }
     show_digit(2, (unsigned char)(buf[1]-'0'), brightness, 0);
     show_digit(3, (unsigned char)(buf[2]-'0'), brightness, 0);
     show_digit(4, (unsigned char)(buf[3]-'0'), brightness, 0);
     set_dots(2, 0, brightness);
-    
-    //LOG(LL_INFO, ("Value: %d", i));
-   
-    //LOG(LL_INFO, ("Time: %s", buf));
-    
-    //i++;
-}      
+}
 
-enum mgos_app_init_result mgos_app_init(void) 
+enum mgos_app_init_result mgos_app_init(void)
 {
   if (mgos_sys_config_get_nixie_cs1_gpio() >= 0) {
     if (mgos_gpio_set_mode(mgos_sys_config_get_nixie_cs1_gpio(), MGOS_GPIO_MODE_OUTPUT)) {
