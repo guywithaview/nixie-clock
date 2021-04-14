@@ -1,0 +1,59 @@
+author: guywithaview
+description: Nixie Tube Clock
+version: 1.0
+platform: esp32
+
+libs_version: ${mos.version}
+modules_version: ${mos.version}
+mongoose_os_version: ${mos.version}
+
+sources:
+  - src
+
+filesystem:
+  - fs
+
+build_vars:
+# The ESP32 built in SPI doesn't appear to work properly
+  MGOS_ENABLE_SPI_GPIO: 1
+
+config_schema:
+  - ["debug.level", 3]
+  - ["wifi.ap.enable", false]
+  - ["wifi.sta.enable", true]
+  - ["wifi.sta.ssid", "Kattegat"]     # Change to your ssid
+  - ["wifi.sta.pass", ""]   # Change to your password
+  - ["http.enable", true]
+  - ["spi.enable", true]
+  - ["spi.debug", false]
+  - ["spi.unit_no", 3]
+  - ["spi.miso_gpio", 19]
+  - ["spi.mosi_gpio", 23]
+  - ["spi.sclk_gpio", 18]
+  - ["spi.cs0_gpio", 21]
+  - ["spi.cs1_gpio", -1]
+  - ["spi.cs2_gpio", -1]
+  - ["nixie", "o", {title: "Nixie Clock settings"}]
+  - ["nixie.utcoffset", "i", 10, {title: "UTC time offset"}]
+  - ["nixie.militarytime", "b", false, {title: "Use 24hr time"}]
+  - ["nixie.backlight", "i", 0x400B00, {title: "Backlight colour"}]
+  - ["nixie.brightness", "i", 96, {title: "Brightness 0-127"}]
+  - ["nixie.cs1_gpio", "i", 15, {title: "GPIO to use for Digit 1 CS"}]
+  - ["nixie.cs2_gpio", "i", 2, {title: "GPIO to use for Digit 2 CS"}]
+  - ["nixie.cs3_gpio", "i", 4, {title: "GPIO to use for Digit 3 CS"}]
+  - ["nixie.cs4_gpio", "i", 5, {title: "GPIO to use for Digit 4 CS"}]
+
+
+# List of libraries used by this app, in order of initialisation
+libs:
+  - origin: https://github.com/mongoose-os-libs/ca-bundle
+  - origin: https://github.com/mongoose-os-libs/rpc-service-config
+  - origin: https://github.com/mongoose-os-libs/rpc-service-fs
+  - origin: https://github.com/mongoose-os-libs/rpc-uart
+  - origin: https://github.com/mongoose-os-libs/wifi
+  - origin: https://github.com/mongoose-os-libs/sntp
+  - origin: https://github.com/mongoose-os-libs/spi
+  - origin: https://github.com/mongoose-os-libs/http-server
+
+# Used by the mos tool to catch mos binaries incompatible with this file format
+manifest_version: 2017-05-18
