@@ -1,15 +1,5 @@
-# A blank Mongoose OS app
+# Nixie Clock
 
 ## Overview
 
-This is an empty app, serves as a skeleton for building Mongoose OS
-apps from scratch.
-
-## How to install this app
-
-- Install and start [mos tool](https://mongoose-os.com/software.html)
-- Switch to the Project page, find and import this app, build and flash it:
-
-<p align="center">
-  <img src="https://mongoose-os.com/images/app1.gif" width="75%">
-</p>
+Displays the time fetched via NTP using four Nixie Tubes. Powered by mongoose-os running on an ESP32.
